@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Labirinto - DFS e BFS</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .maze-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .maze {
+            display: grid;
+            gap: 1px;
+            background: #333;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .cell {
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .wall { background: #2c3e50; }
+        .path { background: #ecf0f1; color: #2c3e50; }
+        .start { background: #27ae60; color: white; }
+        .end { background: #e74c3c; color: white; }
+        .visited { background: #f39c12; color: white; }
+        .solution { background: #9b59b6; color: white; }
+        .current { background: #3498db; color: white; animation: pulse 0.5s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧩 Sistema de Labirinto</h1>
+        
+        <div class="controls">
+            <button onclick="generateMaze()">Gerar Novo Labirinto</button>
+            <button onclick="solveDFS()">Resolver com DFS</button>
+            <button onclick="solveBFS()">Resolver com BFS</button>
+            <button onclick="reset()">Resetar</button>
+            <button onclick="toggleAnimation()">
+                <span id="animToggle">Desabilitar Animação</span>
+            </button>
+        </div>
+
+        <div class="maze-container">
+            <div id="maze" class="maze"></div>
+        </div>
+
+        <div class="info">
+            <div class="info-panel">
+                <h3>📊 Estatísticas</h3>
+                <div id="stats">
+                    <p><strong>Algoritmo:</strong> <span id="algorithm">-</span></p>
+                    <p><strong>Células visitadas:</strong> <span id="visited">0</span></p>
+                    <p><strong>Comprimento do caminho:</strong> <span id="pathLength">0</span></p>
+                    <p><strong>Tempo de execução:</strong> <span id="executionTime">0ms</span></p>
+                    <p><strong>Status:</strong> <span id="status">Aguardando...</span></p>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <h3>🎨 Legenda</h3>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color wall"></div>
+                        <span>Parede</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color path"></div>
+                        <span>Caminho</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color start"></div>
+                        <span>Início (S)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color end"></div>
+                        <span>Fim (E)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color visited"></div>
+                        <span>Visitado</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color solution"></div>
+                        <span>Solução</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Classe principal do Labirinto
+        class Maze {
+            constructor(rows = 15, cols = 21) {
+                this.rows = rows;
+                this.cols = cols;
+                this.maze = [];
+                this.start = null;
+                this.end = null;
+                this.visited = new Set();
+                this.path = [];
+                this.animationEnabled = true;
+                this.animationDelay = 50;
+                
+                this.generateMaze();
+            }
+
+            // Gera um labirinto aleatório
+            generateMaze() {
+                // Inicializa com paredes
+                this.maze = Array(this.rows).fill().map(() => Array(this.cols).fill(1));
+                
+                // Algoritmo de geração usando DFS recursivo
+                const stack = [];
+                const startRow = 1;
+                const startCol = 1;
+                
+                this.maze[startRow][startCol] = 0;
+                stack.push([startRow, startCol]);
+                
+                const directions = [[-2, 0], [2, 0], [0, -2], [0, 2]];
+                
+                while (stack.length > 0) {
+                    const [row, col] = stack[stack.length - 1];
+                    const neighbors = [];
+                    
+                    for (const [dr, dc] of directions) {
+                        const newRow = row + dr;
+                        const newCol = col + dc;
+                        
+                        if (newRow > 0 && newRow < this.rows - 1 && 
+                            newCol > 0 && newCol < this.cols - 1 && 
+                            this.maze[newRow][newCol] === 1) {
+                            neighbors.push([newRow, newCol, row + dr/2, col + dc/2]);
+                        }
+                    }
+                    
+                    if (neighbors.length > 0) {
+                        const [newRow, newCol, wallRow, wallCol] = neighbors[Math.floor(Math.random() * neighbors.length)];
+                        this.maze[newRow][newCol] = 0;
+                        this.maze[wallRow][wallCol] = 0;
+                        stack.push([newRow, newCol]);
+                    } else {
+                        stack.pop();
+                    }
+                }
+                
+                // Define início e fim
+                this.start = [1, 1];
+                this.end = [this.rows - 2, this.cols - 2];
+                
+                // Garante que o fim seja acessível
+                this.maze[this.end[0]][this.end[1]] = 0;
+            }
+
+            // Busca em Profundidade (DFS)
+            async solveDFS() {
+                this.reset();
+                const startTime = Date.now();
+                
+                const stack = [[...this.start, []]];
+                const visited = new Set();
+                visited.add(`${this.start[0]},${this.start[1]}`);
+                
+                while (stack.length > 0) {
+                    const [row, col, path] = stack.pop();
+                    const currentPath = [...path, [row, col]];
+                    
+                    if (this.animationEnabled) {
+                        await this.animateStep(row, col, 'current');
+                        await this.delay(this.animationDelay);
+                    }
+                    
+                    if (row === this.end[0] && col === this.end[1]) {
+                        await this.showSolution(currentPath, Date.now() - startTime, 'DFS');
+                        return true;
+                    }
+                    
+                    if (this.animationEnabled) {
+                        await this.animateStep(row, col, 'visited');
+                    }
+                    
+                    this.visited.add(`${row},${col}`);
+                    
+                    const neighbors = this.getNeighbors(row, col);
+                    for (const [newRow, newCol] of neighbors) {
+                        const key = `${newRow},${newCol}`;
+                        if (!visited.has(key)) {
+                            visited.add(key);
+                            stack.push([newRow, newCol, currentPath]);
+                        }
+                    }
+                    
+                    this.updateStats('DFS', visited.size, 0, Date.now() - startTime);
+                }
+                
+                this.updateStatus('Sem solução encontrada!');
+                return false;
+            }
+
+            // Busca em Largura (BFS)
+            async solveBFS() {
+                this.reset();
+                const startTime = Date.now();
+                
+                const queue = [[...this.start, []]];
+                const visited = new Set();
+                visited.add(`${this.start[0]},${this.start[1]}`);
+                
+                while (queue.length > 0) {
+                    const [row, col, path] = queue.shift();
+                    const currentPath = [...path, [row, col]];
+                    
+                    if (this.animationEnabled) {
+                        await this.animateStep(row, col, 'current');
+                        await this.delay(this.animationDelay);
+                    }
+                    
+                    if (row === this.end[0] && col === this.end[1]) {
+                        await this.showSolution(currentPath, Date.now() - startTime, 'BFS');
+                        return true;
+                    }
+                    
+                    if (this.animationEnabled) {
+                        await this.animateStep(row, col, 'visited');
+                    }
+                    
+                    this.visited.add(`${row},${col}`);
+                    
+                    const neighbors = this.getNeighbors(row, col);
+                    neighbors.reverse(); // Para BFS, queremos explorar em ordem
+                    
+                    for (const [newRow, newCol] of neighbors) {
+                        const key = `${newRow},${newCol}`;
+                        if (!visited.has(key)) {
+                            visited.add(key);
+                            queue.push([newRow, newCol, currentPath]);
+                        }
+                    }
+                    
+                    this.updateStats('BFS', visited.size, 0, Date.now() - startTime);
+                }
+                
+                this.updateStatus('Sem solução encontrada!');
+                return false;
+            }
+
+            // Obtém vizinhos válidos
+            getNeighbors(row, col) {
+                const neighbors = [];
+                const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+                
+                for (const [dr, dc] of directions) {
+                    const newRow = row + dr;
+                    const newCol = col + dc;
+                    
+                    if (newRow >= 0 && newRow < this.rows && 
+                        newCol >= 0 && newCol < this.cols && 
+                        this.maze[newRow][newCol] === 0) {
+                        neighbors.push([newRow, newCol]);
+                    }
+                }
+                
+                return neighbors;
+            }
+
+            // Anima um passo da busca
+            async animateStep(row, col, className) {
+                const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                if (cell && !cell.classList.contains('start') && !cell.classList.contains('end')) {
+                    cell.className = `cell ${className}`;
+                }
+            }
+
+            // Mostra a solução encontrada
+            async showSolution(path, executionTime, algorithm) {
+                this.path = path;
+                
+                if (this.animationEnabled) {
+                    for (let i = 0; i < path.length; i++) {
+                        const [row, col] = path[i];
+                        const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                        if (cell && !cell.classList.contains('start') && !cell.classList.contains('end')) {
+                            cell.className = 'cell solution';
+                            await this.delay(30);
+                        }
+                    }
+                }
+                
+                this.updateStats(algorithm, this.visited.size, path.length, executionTime);
+                this.updateStatus('Solução encontrada!');
+            }
+
+            // Atualiza as estatísticas
+            updateStats(algorithm, visitedCount, pathLength, time) {
+                document.getElementById('algorithm').textContent = algorithm;
+                document.getElementById('visited').textContent = visitedCount;
+                document.getElementById('pathLength').textContent = pathLength;
+                document.getElementById('executionTime').textContent = time + 'ms';
+            }
+
+            // Atualiza o status
+            updateStatus(status) {
+                document.getElementById('status').textContent = status;
+            }
+
+            // Reseta o estado da busca
+            reset() {
+                this.visited.clear();
+                this.path = [];
+                this.render();
+                this.updateStats('-', 0, 0, 0);
+                this.updateStatus('Aguardando...');
+            }
+
+            // Função de delay para animação
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            // Renderiza o labirinto
+            render() {
+                const mazeElement = document.getElementById('maze');
+                mazeElement.style.gridTemplateColumns = `repeat(${this.cols}, 1fr)`;
+                mazeElement.innerHTML = '';
+                
+                for (let row = 0; row < this.rows; row++) {
+                    for (let col = 0; col < this.cols; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.dataset.row = row;
+                        cell.dataset.col = col;
+                        
+                        if (this.maze[row][col] === 1) {
+                            cell.classList.add('wall');
+                        } else {
+                            cell.classList.add('path');
+                        }
+                        
+                        if (row === this.start[0] && col === this.start[1]) {
+                            cell.classList.add('start');
+                            cell.textContent = 'S';
+                        } else if (row === this.end[0] && col === this.end[1]) {
+                            cell.classList.add('end');
+                            cell.textContent = 'E';
+                        }
+                        
+                        mazeElement.appendChild(cell);
+                    }
+                }
+            }
+
+            // Toggle da animação
+            toggleAnimation() {
+                this.animationEnabled = !this.animationEnabled;
+                const toggle = document.getElementById('animToggle');
+                toggle.textContent = this.animationEnabled ? 'Desabilitar Animação' : 'Habilitar Animação';
+            }
+        }
+
+        // Instância global do labirinto
+        let maze = new Maze();
+
+        // Funções globais para os botões
+        function generateMaze() {
+            maze = new Maze();
+            maze.render();
+        }
+
+        function solveDFS() {
+            maze.solveDFS();
+        }
+
+        function solveBFS() {
+            maze.solveBFS();
+        }
+
+        function reset() {
+            maze.reset();
+        }
+
+        function toggleAnimation() {
+            maze.toggleAnimation();
+        }
+
+        // Inicialização
+        maze.render();
+    </script>
+</body>
+</html>
