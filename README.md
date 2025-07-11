@@ -1,4 +1,4 @@
-# Análise Detalhada: Sistema de Labirinto com Algoritmos de Busca
+# Sistema de Labirinto com Algoritmos de Busca
 
 ## 1. Visão Geral da Estrutura
 
