@@ -178,10 +178,6 @@ setupClickListeners() {
 - **Diferentes algoritmos de geração**: Kruskal, Prim
 - **Modo multiplayer**: Corrida para encontrar a saída
 
-## 8. Conclusão
-
-Este projeto demonstra uma **implementação sólida e educativa** de estruturas de dados fundamentais aplicadas a um problema real. A escolha de usar matriz para representar o labirinto é **adequada e eficiente**, while os algoritmos DFS e BFS são implementados de forma **clara e comparável**.
-
 A complexidade geral do sistema é **apropriada para o problema**, balanceando performance com funcionalidade. O código mostra boas práticas de programação orientada a objetos e oferece uma experiência de usuário rica e interativa.
 
 **Nota Técnica**: O projeto serve tanto como ferramenta educativa quanto como base sólida para expansões futuras, demonstrando princípios fundamentais de algoritmos e estruturas de dados de forma prática e visual.
