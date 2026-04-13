@@ -1,5 +1,13 @@
 import { useState, useRef, useCallback } from "react";
 
+function TrophyIcon() {
+    return (
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style={{ verticalAlign: "middle", marginLeft: 3, opacity: 0.85 }}>
+            <path d="M19 5h-2V3H7v2H5C3.9 5 3 5.9 3 7v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0 0 11 15.9V17H9v2h6v-2h-2v-1.1a5.01 5.01 0 0 0 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+        </svg>
+    );
+}
+
 const WALL = 1;
 const PATH = 0;
 
@@ -386,8 +394,8 @@ export default function MazeSolver() {
                     <p style={{ fontSize: 13, fontWeight: 500, margin: "0 0 10px" }}>Comparação de algoritmos</p>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, fontSize: 13 }}>
                         <div />
-                        <div style={{ fontWeight: 500, color: COLORS.solutionDFS }}>DFS {comparison.winner === "DFS" && "🏆"}</div>
-                        <div style={{ fontWeight: 500, color: COLORS.solutionBFS }}>BFS {comparison.winner === "BFS" && "🏆"}</div>
+                        <div style={{ fontWeight: 500, color: COLORS.solutionDFS }}>DFS {comparison.winner === "DFS" && <TrophyIcon />}</div>
+                        <div style={{ fontWeight: 500, color: COLORS.solutionBFS }}>BFS {comparison.winner === "BFS" && <TrophyIcon />}</div>
                         {[["Células visitadas", comparison.dfs.visited, comparison.bfs.visited], ["Caminho", comparison.dfs.path, comparison.bfs.path], ["Tempo", comparison.dfs.time, comparison.bfs.time]].flatMap(([label, d, b]) => [
                             <div key={`l-${label}`} style={{ color: "var(--color-text-secondary)", padding: "3px 0" }}>{label}</div>,
                             <div key={`d-${label}`} style={{ padding: "3px 0" }}>{d}</div>,
