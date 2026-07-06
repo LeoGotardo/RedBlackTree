@@ -1,16 +1,48 @@
-# React + Vite
+# Sistema de Labirinto
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An interactive maze generator and pathfinding visualizer built with React. Generate random mazes, watch DFS and BFS solve them cell by cell, and compare how the two algorithms behave on the same grid.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Maze generation** — randomized depth-first backtracking carves a solvable maze on a configurable grid (9–41 rows, 9–51 columns), with automatic start/end placement and connectivity checks.
+- **Pathfinding visualizer** — step-by-step animation of DFS and BFS as they explore the grid and trace the final path, with adjustable animation speed.
+- **Compare mode** — run DFS and BFS back to back on the same maze and see nodes explored, path length, and execution time side by side, with a winner called out.
+- **Interactive controls** — drag the start/end points, randomize the end cell, tweak grid size, toggle animation/labels/glow effects.
+- **Algorithms page** — a reference view explaining DFS and BFS with pseudocode, complexity, pros/cons, and a side-by-side comparison table.
 
-## React Compiler
+## Tech stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- [React 19](https://react.dev/)
+- [Vite](https://vite.dev/) for dev server and bundling
+- [Tailwind CSS](https://tailwindcss.com/) for styling
+- [ESLint](https://eslint.org/) for linting
 
-## Expanding the ESLint configuration
+## Getting started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev
+```
+
+The app will be available at the URL printed by Vite (typically `http://localhost:5173`).
+
+## Scripts
+
+| Command           | Description                          |
+| ----------------- | ------------------------------------ |
+| `npm run dev`     | Start the Vite dev server with HMR   |
+| `npm run build`   | Build a production bundle            |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint`    | Run ESLint over the project          |
+
+## Project structure
+
+```
+src/
+├── App.jsx                     # Page router (generator ↔ algorithms)
+├── components/
+│   ├── Screen.jsx               # Maze generator + DFS/BFS solver UI
+│   └── AlgorithmsPage.jsx       # DFS/BFS reference and comparison page
+├── index.css
+└── main.jsx
+```
