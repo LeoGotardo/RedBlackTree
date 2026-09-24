@@ -533,6 +533,20 @@ export default function MazeSolver({ setPage }) {
               </div>
             ))}
           </div>
+
+          <div className="border-t border-white/5" />
+
+          <p className="text-center text-[11px] text-slate-500">
+            made with ❤️ by{" "}
+            <a
+              href="https://leogotardo.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              Leo Gotardo
+            </a>
+          </p>
         </div>
       </div>
 
